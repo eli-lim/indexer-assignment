@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a
+        with:
+          node-version: 16
+          cache: npm
+
+      - run: npm ci
+      - run: npm run postinstall --ws --if-present
+      - run: npm run all:clean
+      - run: npm run all:build
+
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a
+        with:
+          node-version: 16
+          cache: npm
+
+      - run: npm ci
+      - run: npm run postinstall --ws --if-present
+      - run: npm run ci:test
