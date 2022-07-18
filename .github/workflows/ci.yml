@@ -22,9 +22,7 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run postinstall --ws --if-present
-      - run: npm run all:clean
-      - run: npm run all:build
+      - run: npm run build
 
   Test:
     runs-on: ubuntu-latest
@@ -37,5 +35,4 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run postinstall --ws --if-present
-      - run: npm run ci:test
+      - run: npm run test
