@@ -23,21 +23,18 @@ export class JsonBlockchainClient
 
   constructor(@Inject(JSON_BLOCKS) private readonly path: string) {}
 
-  async getChainHeight(): Promise<number> {
-    return this.simulateAsync(() => {
-      return this.blocks.length;
-    });
+  async getBlockCount(): Promise<number> {
+    return this.delay(() => this.blocks[this.blocks.length - 1].height + 1);
   }
 
-  async getBlockByHeight(height: number): Promise<Block | undefined> {
-    return this.simulateAsync(() => {
-      const blocks = this.blocks.filter((block) => height === block.height);
-      return blocks[0];
-    });
+  async getBlocksAtHeight(height: number): Promise<Block[] | undefined> {
+    return this.delay(() =>
+      this.blocks.filter((block) => height === block.height),
+    );
   }
 
   async getBlockByHash(hash: string): Promise<Block | undefined> {
-    return this.simulateAsync(() => {
+    return this.delay(() => {
       const blocks = this.blocks.filter((block) => hash === block.hash);
       return blocks[0];
     });
@@ -50,6 +47,7 @@ export class JsonBlockchainClient
   onApplicationBootstrap(): void {
     this.blocks = JSON.parse(readFileSync(this.path).toString()) as Block[];
   }
+
   /**
    * Called by Nest as part of app shutdown phase
    * @see https://docs.nestjs.com/fundamentals/lifecycle-events
@@ -58,7 +56,7 @@ export class JsonBlockchainClient
     this.timeouts.forEach(clearTimeout);
   }
 
-  private async simulateAsync<T>(callback: () => T): Promise<T> {
+  private async delay<T>(callback: () => T): Promise<T> {
     return new Promise<T>((resolve) => {
       // Simulate non-deterministic response time
       const timeout = setTimeout(() => {

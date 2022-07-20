@@ -27,27 +27,26 @@ describe('JsonFileBlockchain', () => {
   });
 
   it('should serve blocks in json file as blockchain data', async () => {
-    expect(await blockchainClient.getBlockByHeight(0)).toStrictEqual(
+    expect(await blockchainClient.getBlocksAtHeight(0)).toStrictEqual([
       jsonBlocks[0],
-    );
-    expect(await blockchainClient.getBlockByHeight(100)).toStrictEqual(
+    ]);
+    expect(await blockchainClient.getBlocksAtHeight(100)).toStrictEqual([
       jsonBlocks[100],
-    );
-    expect(await blockchainClient.getBlockByHeight(199)).toStrictEqual(
-      jsonBlocks[199],
-    );
+    ]);
+    expect(await blockchainClient.getBlocksAtHeight(199)).toStrictEqual([
+      jsonBlocks[200], // offset by 1 due to fork (2 blocks) at height 198
+    ]);
   });
 
   it('should get chain height', async () => {
-    const height = await blockchainClient.getChainHeight();
-    expect(height).toStrictEqual(jsonBlocks.length);
+    const height = await blockchainClient.getBlockCount();
     expect(height).toStrictEqual(200);
   });
 
   it('should get block by height', async () => {
-    expect(await blockchainClient.getBlockByHeight(0)).toStrictEqual(
+    expect(await blockchainClient.getBlocksAtHeight(0)).toStrictEqual([
       jsonBlocks[0],
-    );
+    ]);
   });
 
   it('should get block by hash', async () => {
@@ -56,5 +55,18 @@ describe('JsonFileBlockchain', () => {
         'd744db74fb70ed42767ae028a129365fb4d7de54ba1b6575fb047490554f8a7b',
       ),
     ).toStrictEqual(jsonBlocks[0]);
+  });
+
+  it('should return forked blocks at height 198', async () => {
+    expect(await blockchainClient.getBlocksAtHeight(198)).toStrictEqual([
+      {
+        hash: 'ef61aaf7f6f742ed825922b10ec504ee74cfcb9c71037706dd8a87c627f541f9',
+        ...jsonBlocks[198],
+      },
+      {
+        hash: 'ef61aaf7f6f742ed825922b10ec504ee74cfcb9c71037706dd8a8FORKEDBLOCK',
+        ...jsonBlocks[199],
+      },
+    ]);
   });
 });
