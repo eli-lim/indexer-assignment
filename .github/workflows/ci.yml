@@ -14,7 +14,7 @@ jobs:
   Build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
 
       - uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a
         with:
@@ -27,7 +27,7 @@ jobs:
   Test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
 
       - uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a
         with:
